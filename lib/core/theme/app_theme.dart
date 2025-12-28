@@ -14,12 +14,17 @@ import 'package:mls/core/constants/colors.dart'; // Ensure package name matches 
 final ThemeData appTheme = ThemeData(
   primaryColor: kPrimaryColor,
   scaffoldBackgroundColor: kBackgroundColor,
-  // Mengatur skema warna menggunakan Primary Color
   colorScheme: ColorScheme.fromSeed(
     seedColor: kPrimaryColor,
     primary: kPrimaryColor,
     secondary: kAccentColor,
     background: kBackgroundColor,
+    surface: kSurfaceColor,
+  ),
+  textTheme: const TextTheme(
+    displayLarge: TextStyle(color: kTextColor, fontWeight: FontWeight.bold),
+    bodyLarge: TextStyle(color: kTextColor),
+    bodyMedium: TextStyle(color: kTextColor),
   ),
   appBarTheme: const AppBarTheme(
     backgroundColor: kPrimaryColor, 
@@ -27,7 +32,6 @@ final ThemeData appTheme = ThemeData(
     elevation: 0,
     centerTitle: true,
   ),
-  // Mengatur style tombol Elevated Button
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: kPrimaryColor,
@@ -36,13 +40,16 @@ final ThemeData appTheme = ThemeData(
         borderRadius: BorderRadius.circular(8), 
       ),
       padding: const EdgeInsets.symmetric(vertical: 16),
+      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
     ),
   ),
-  // Mengatur style Text Field (untuk form Login)
-  inputDecorationTheme: InputDecorationTheme(
+  inputDecorationTheme: const InputDecorationTheme(
     focusedBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: kPrimaryColor, width: 2),
     ),
+    enabledBorder: UnderlineInputBorder(
+      borderSide: BorderSide(color: Colors.grey),
+    ),
+    labelStyle: TextStyle(color: kTextLightColor),
   ),
-  // Anda bisa menambahkan TextTheme di sini jika ingin menggunakan font kustom.
 );
