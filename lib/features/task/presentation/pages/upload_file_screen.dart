@@ -1,118 +1,204 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart'; // Import File Picker
 import 'package:mls/core/constants/colors.dart';
-import 'dart:ui'; // Needed for PathMetric
-// import 'package:path_drawing/path_drawing.dart'; // Removed invalid import 
-// Actually, I should check if I can add a dependency or use a custom painter. 
-// Given restrictions, I'll use a CustomPaint for dashed border or a simplified version.
-// Using 'dotted_border' package is common, but I don't know if I can add packages easily without user input for 'flutter pub add'.
-// The prompt said "npx" for web, but for flutter? "Run Smart Presence App" log implies I can run commands.
-// But keeping it simple with CustomPainter is safer to avoid dependency issues if internet/pub is partial.
-// I will implement a simple DashedRectPainter.
+import 'dart:async'; // For simulation delay
+import 'dart:ui'; // Needed for PathMetrics
 
-class UploadFileScreen extends StatelessWidget {
+class UploadFileScreen extends StatefulWidget {
   const UploadFileScreen({super.key});
+
+  @override
+  State<UploadFileScreen> createState() => _UploadFileScreenState();
+}
+
+class _UploadFileScreenState extends State<UploadFileScreen> {
+  PlatformFile? _selectedFile; // Store selected file
+  bool _isUploading = false;
+
+  // Function to pick file
+  Future<void> _pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      setState(() {
+        _selectedFile = result.files.first;
+      });
+    } else {
+      // User canceled the picker
+    }
+  }
+
+  // Function to remove selected file
+  void _removeFile() {
+    setState(() {
+      _selectedFile = null;
+    });
+  }
+
+  // Function to simulate upload
+  Future<void> _uploadFile() async {
+    if (_selectedFile == null) return;
+
+    setState(() {
+      _isUploading = true;
+    });
+
+    // Simulate network delay
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+
+    setState(() {
+      _isUploading = false;
+    });
+
+    // Show Success Message
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('File berhasil dikirim!'),
+        backgroundColor: kAccentColor,
+      ),
+    );
+
+    // Return to previous screen
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Upload File'),
-        backgroundColor: kPrimaryColor,
+        title: const Text('Upload Tugas', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Maksimum File 5MB, format PDF, DOCX, ZIP.',
-              style: TextStyle(color: kTextLightColor, fontSize: 14),
-            ),
-            const SizedBox(height: 20),
-
-            // Dashed Upload Area
+            // Upload Area
             Expanded(
-              flex: 2, // Take some space but not all
-              child: CustomPaint(
-                painter: DashedRectPainter(color: Colors.grey, strokeWidth: 2.0, gap: 5.0),
-                child: Container(
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: kSurfaceColor.withOpacity(0.5),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.cloud_upload, size: 80, color: Colors.blue),
-                      const SizedBox(height: 16),
-                      Text(
-                        'File yang akan diupload tampil di sini',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                      ),
-                    ],
+              child: GestureDetector(
+                onTap: _pickFile, // Pick file on tap
+                child: CustomPaint(
+                  painter: DashedRectPainter(color: Colors.grey, strokeWidth: 1.5, gap: 5.0),
+                  child: Container(
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      // dashed border handled by CustomPaint
+                    ),
+                    child: _selectedFile == null 
+                      ? _buildEmptyState() 
+                      : _buildSelectedFileState(), // Show selected file
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 24),
             
-            const Spacer(),
-
-            // Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[300],
-                      foregroundColor: kTextColor,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    onPressed: () {
-                      // Pick File Logic
-                    },
-                    child: const Text('Pilih File'),
-                  ),
+            // Upload Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: (_selectedFile != null && !_isUploading) ? _uploadFile : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPrimaryColor,
+                  disabledBackgroundColor: Colors.grey[300],
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    onPressed: () {
-                      // Save Logic
-                      Navigator.pop(context); // Go back to Task Detail
-                      // Ideally show snackbar
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('File berhasil diupload')),
-                      );
-                    },
-                    child: const Text('Simpan'),
-                  ),
-                ),
-              ],
+                child: _isUploading
+                    ? const SizedBox(
+                        height: 20, 
+                        width: 20, 
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                      )
+                    : const Text(
+                        'Simpan & Kirim',
+                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+              ),
             ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildEmptyState() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.purple[50],
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.cloud_upload_outlined, size: 40, color: Colors.purple),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Sentuh untuk memilih file',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: kTextColor),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'JPG, PNG, PDF (Maks. 10MB)',
+          style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSelectedFileState() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: kGreenLight.withOpacity(0.3), // Success green
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.insert_drive_file, size: 40, color: kGreenDark),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          _selectedFile!.name,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: kTextColor),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '${(_selectedFile!.size / 1024).toStringAsFixed(1)} KB',
+          style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+        ),
+        const SizedBox(height: 16),
+        TextButton.icon(
+          onPressed: _removeFile, 
+          icon: const Icon(Icons.close, color: Colors.red), 
+          label: const Text('Hapus File', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    );
+  }
 }
 
+// Reuse the existing DashedRectPainter logic
 class DashedRectPainter extends CustomPainter {
   final double strokeWidth;
   final Color color;
   final double gap;
 
-  DashedRectPainter({this.strokeWidth = 5.0, this.color = Colors.red, this.gap = 5.0});
+  DashedRectPainter({this.strokeWidth = 1.0, this.color = Colors.black, this.gap = 5.0});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -121,44 +207,45 @@ class DashedRectPainter extends CustomPainter {
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
 
-    double x = size.width;
-    double y = size.height;
+    double x = 0;
+    double y = 0;
+    double w = size.width;
+    double h = size.height;
 
     Path _topPath = Path();
-    _topPath.moveTo(0, 0);
-    _topPath.lineTo(x, 0);
+    _topPath.moveTo(x, y);
+    _topPath.lineTo(w, y);
 
     Path _rightPath = Path();
-    _rightPath.moveTo(x, 0);
-    _rightPath.lineTo(x, y);
+    _rightPath.moveTo(w, y);
+    _rightPath.lineTo(w, h);
 
     Path _bottomPath = Path();
-    _bottomPath.moveTo(x, y);
-    _bottomPath.lineTo(0, y);
+    _bottomPath.moveTo(w, h);
+    _bottomPath.lineTo(x, h);
 
     Path _leftPath = Path();
-    _leftPath.moveTo(0, y);
-    _leftPath.lineTo(0, 0);
+    _leftPath.moveTo(x, h);
+    _leftPath.lineTo(x, y);
 
-    canvas.drawPath(_dashPath(_topPath, dashWidth: 10, dashSpace: gap), dashedPaint);
-    canvas.drawPath(_dashPath(_rightPath, dashWidth: 10, dashSpace: gap), dashedPaint);
-    canvas.drawPath(_dashPath(_bottomPath, dashWidth: 10, dashSpace: gap), dashedPaint);
-    canvas.drawPath(_dashPath(_leftPath, dashWidth: 10, dashSpace: gap), dashedPaint);
+    _drawDashedPath(canvas, _topPath, dashedPaint);
+    _drawDashedPath(canvas, _rightPath, dashedPaint);
+    _drawDashedPath(canvas, _bottomPath, dashedPaint);
+    _drawDashedPath(canvas, _leftPath, dashedPaint);
   }
 
-  Path _dashPath(Path source, {required double dashWidth, required double dashSpace}) {
-    final Path path = Path();
-    for (final PathMetric metric in source.computeMetrics()) {
+  void _drawDashedPath(Canvas canvas, Path path, Paint paint) {
+    PathMetrics pathMetrics = path.computeMetrics();
+    for (PathMetric pathMetric in pathMetrics) {
       double distance = 0.0;
-      while (distance < metric.length) {
-        path.addPath(
-          metric.extractPath(distance, distance + dashWidth),
-          Offset.zero,
+      while (distance < pathMetric.length) {
+        canvas.drawPath(
+          pathMetric.extractPath(distance, distance + gap),
+          paint,
         );
-        distance += dashWidth + dashSpace;
+        distance += gap * 2;
       }
     }
-    return path;
   }
 
   @override

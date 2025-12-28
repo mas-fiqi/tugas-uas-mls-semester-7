@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mls/core/constants/colors.dart';
-import 'package:mls/shared/widgets/course_card.dart';
 import 'package:mls/features/profile/presentation/pages/profile_screen.dart';
+import 'package:mls/features/notification/presentation/pages/notification_screen.dart';
+import 'package:mls/shared/widgets/course_card.dart';
+import 'package:mls/features/course/presentation/pages/course_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -9,186 +11,286 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBackgroundColor,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 50),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // a. Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Hallo,',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: kTextLightColor,
-                      ),
+      backgroundColor: Colors.white, // Clean white background
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. Header (Compact & Elegant)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hi, Mahasiswa!',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const Text(
+                          "Explore today's",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: kTextColor,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      'Mahasiswa', // TODO: Ganti dengan nama user dinamis
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: kTextColor,
-                      ),
+                    IconButton(
+                        onPressed: () {
+                           Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const NotificationScreen()),
+                          );
+                        },
+                        icon: Stack(
+                          children: [
+                             const Icon(Icons.notifications_outlined, size: 28, color: kTextColor),
+                             Positioned(
+                               right: 0,
+                               top: 0,
+                               child: Container(
+                                 padding: const EdgeInsets.all(4),
+                                 decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                               ),
+                             ),
+                          ],
+                        ),
                     ),
                   ],
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
+              ),
+
+              const SizedBox(height: 24),
+
+              // 2. Story / Status List (Slightly smaller, more whitespace)
+              SizedBox(
+                height: 90,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  children: [
+                    _buildStoryItem('Emilia', 'assets/images/kampus.png', true),
+                    _buildStoryItem('Richard', 'assets/images/kampus.png', false),
+                    _buildStoryItem('Jasmine', 'assets/images/kampus.png', true),
+                    _buildStoryItem('Lucas', 'assets/images/kampus.png', false),
+                    _buildStoryItem('Hendrik', 'assets/images/kampus.png', true),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 3. Main Content (Refined Cards - Smaller & Less Aggressive)
+              SizedBox(
+                height: 240, // Height reduced from 400 for elegance
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  children: [
+                    // Card 1: Tugas
+                    _buildLargeCard(
                       context,
-                      MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                    );
-                  },
-                  child: const CircleAvatar(
-                    radius: 25,
-                    backgroundColor: kSurfaceColor,
-                    child: Icon(Icons.person, color: kPrimaryColor),
+                      title: 'Desain UI/UX',
+                      subtitle: 'Deadline 9 AM',
+                      color: kPrimaryColor, // Unify to Green
+                      imageAsset: 'assets/images/kampus.png',
+                      isTask: true,
+                    ),
+                    const SizedBox(width: 16),
+                    // Card 2: Pengumuman
+                    _buildLargeCard(
+                      context,
+                      title: 'Jadwal UAS',
+                      subtitle: 'Pengumuman',
+                      color: Colors.blueAccent,
+                      imageAsset: 'assets/images/kampus.png',
+                      isTask: false,
+                    ),
+                     const SizedBox(width: 16),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 32),
+
+              // 4. "Kelas Hari Ini" (Restored as requested)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  'Kelas Hari Ini',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: kTextColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    CourseCard(
+                      courseName: 'System Integration',
+                      lecturerCode: 'Dosen: Dr. Budi Santoso',
+                      progress: 0.75,
+                      iconData: Icons.integration_instructions,
+                      iconColor: Colors.orange,
+                      onTap: () {
+                         Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const CourseDetailScreen(
+                            courseName: 'System Integration',
+                            lecturerName: 'Dr. Budi Santoso',
+                          )),
+                        );
+                      },
+                    ),
+                    CourseCard(
+                      courseName: 'Mobile Programming',
+                      lecturerCode: 'Dosen: Bu Siti Aminah',
+                      progress: 0.45,
+                      iconData: Icons.phone_android,
+                      iconColor: Colors.green,
+                      onTap: () {
+                         Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const CourseDetailScreen(
+                            courseName: 'Mobile Programming',
+                            lecturerName: 'Bu Siti Aminah',
+                          )),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStoryItem(String name, String imagePath, bool isOnline) {
+    return Container(
+      margin: const EdgeInsets.only(right: 16),
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              Container(
+                width: 60, // Smaller
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.blueAccent.withOpacity(0.5), width: 2), // Softer Ring
+                  image: DecorationImage(
+                    image: AssetImage(imagePath), 
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              if (isOnline)
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.circle, size: 10, color: Colors.greenAccent), // Green dot
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            name,
+            style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLargeCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required Color color,
+    required String imageAsset,
+    required bool isTask,
+  }) {
+    return Container(
+      width: 200, // Reduced width
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: color,
+        image: DecorationImage(
+          image: AssetImage(imageAsset),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(0.3), // Darker overlay for text readability
+            BlendMode.darken,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.2),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end, 
+              children: [
+                Container(
+                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                   decoration: BoxDecoration(
+                     color: Colors.white.withOpacity(0.3),
+                     borderRadius: BorderRadius.circular(12),
+                   ),
+                   child: Text(
+                     subtitle,
+                     style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                   ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18, // Elegant font size
+                    fontWeight: FontWeight.bold,
+                    height: 1.2,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 30),
-
-            // b. Kartu Tugas (Merah)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: kPrimaryColor,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: kPrimaryColor.withOpacity(0.4),
-                    offset: const Offset(0, 8),
-                    blurRadius: 16,
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      'Tugas 01',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Desain Antarmuka Pengguna\nModern',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: const [
-                      Icon(Icons.access_time, color: Colors.white70, size: 16),
-                      SizedBox(width: 8),
-                      Text(
-                        'Dikumpulkan: Besok, 09:00',
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
-
-            // c. Pengumuman
-            const Text(
-              'Pengumuman Terakhir',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: kTextColor,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              height: 120,
-              decoration: BoxDecoration(
-                color: Colors.grey[300], // Placeholder
-                borderRadius: BorderRadius.circular(12),
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/kampus.png'), // Reuse image
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black26, 
-                    BlendMode.darken,
-                  ),
-                ),
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                'Jadwal UAS Semester Ganjil',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-
-            // d. Progres Kelas
-            const Text(
-              'Progres Kelas',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: kTextColor,
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // List Mata Kuliah (Dummy Data)
-            const CourseCard(
-              courseName: 'Pemrograman Web',
-              lecturerCode: 'Dosen: Pak Budi',
-              progress: 0.75,
-              iconColor: Colors.orange,
-              iconData: Icons.web,
-            ),
-            const CourseCard(
-              courseName: 'Mobile Development',
-              lecturerCode: 'Dosen: Bu Siti',
-              progress: 0.40,
-              iconColor: Colors.blue,
-              iconData: Icons.phone_android,
-            ),
-            const CourseCard(
-              courseName: 'Basis Data Lanjut',
-              lecturerCode: 'Dosen: Pak Joko',
-              progress: 0.90,
-              iconColor: Colors.purple,
-              iconData: Icons.storage,
-            ),
-             const CourseCard(
-              courseName: 'Statistika',
-              lecturerCode: 'Dosen: Bu Ani',
-              progress: 0.20,
-              iconColor: Colors.green,
-              iconData: Icons.bar_chart,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

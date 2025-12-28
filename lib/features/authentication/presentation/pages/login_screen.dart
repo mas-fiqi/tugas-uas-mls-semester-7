@@ -15,149 +15,218 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Bagian Atas (35% layar)
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.35,
-              child: Stack(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Top Right Layout (Language)
+              Align(
+                alignment: Alignment.topRight,
+                child: Text(
+                  'English (USA) ▼',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              ),
+              const SizedBox(height: 40),
+
+              // Title
+              const Center(
+                child: Text(
+                  'Log In',
+                  style: TextStyle(
+                    fontFamily: 'Serif', // Fallback to serif
+                    fontSize: 36,
+                    fontWeight: FontWeight.w500,
+                    color: kPrimaryColor, // Use new Bright Green
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+
+              // Social Buttons
+              Row(
                 children: [
-                   ClipPath(
-                    clipper: HeaderClipper(),
-                    child: Container(
-                      color: kPrimaryColor, // Fallback color
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: Image.asset(
-                        'assets/images/kampus.png',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: kPrimaryColor,
-                        ),
-                      ),
+                  Expanded(
+                    child: _buildSocialButton(
+                      text: 'Log in with google',
+                      icon: Icons.g_mobiledata, // Placeholder for G Icon
+                      color: Colors.blue,
                     ),
                   ),
-                   // Overlay warna transparan agar teks/konten lebih terbaca (opsional)
-                  ClipPath(
-                    clipper: HeaderClipper(),
-                    child: Container(
-                      color: kPrimaryColor.withOpacity(0.6),
-                      width: double.infinity,
-                      height: double.infinity,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildSocialButton(
+                      text: 'Log in with facebook',
+                      icon: Icons.facebook, 
+                      color: Colors.indigo,
                     ),
                   ),
                 ],
               ),
-            ),
-            
-            // Bagian Bawah (Isi Form)
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 30),
+
+              // Divider OR
+              Row(
                 children: [
-                  const Text(
-                    'Login',
+                  Expanded(child: Divider(color: Colors.grey[400])),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      'OR',
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
+                    ),
+                  ),
+                  Expanded(child: Divider(color: Colors.grey[400])),
+                ],
+              ),
+              const SizedBox(height: 30),
+
+              // Email Field
+              _buildInputField(
+                label: 'Your Email',
+                icon: Icons.mail_outline,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              
+              // Password Field
+              TextField(
+                obscureText: !_isPasswordVisible,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  labelStyle: TextStyle(color: Colors.grey[600]),
+                  enabledBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: kPrimaryColor, width: 2),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.grey[400],
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 50),
+
+              // Submit Button
+              SizedBox(
+                height: 55,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kGreenLight, // Pale Green
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () {
+                    // Navigasi ke MainScreen (Dashboard)
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => const MainScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'L O G I N',
                     style: TextStyle(
-                      fontSize: 32,
+                      color: Colors.white,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: kTextColor,
+                      letterSpacing: 2.0,
                     ),
                   ),
-                  const SizedBox(height: 30),
-                  
-                  // Email Field
-                  TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'Email 365',
-                      prefixIcon: Icon(Icons.email_outlined),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 20),
-                  
-                  // Password Field
-                  TextField(
-                    obscureText: !_isPasswordVisible,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  
+                ),
+              ),
+              const SizedBox(height: 30),
 
-
-                  // Tombol Log In
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                         // Navigasi ke MainScreen (Dashboard)
-                         Navigator.of(context).pushReplacement(
-                           MaterialPageRoute(builder: (context) => const MainScreen()),
-                         );
-                      },
-                      child: const Text('Log In'),
-                    ),
+              // Footer
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have An Account? ",
+                    style: TextStyle(color: Colors.grey[700]),
                   ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Tombol Bantuan
-                  Center(
-                    child: TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'Bantuan ?',
-                        style: TextStyle(color: kTextLightColor),
+                  GestureDetector(
+                    onTap: () {
+                       // Navigate to Register (if implemented)
+                    },
+                    child: const Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        color: kGreenLight,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
-// CustomClipper untuk lengkungan bawah header
-class HeaderClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(0, size.height - 50); // Mulai dari kiri bawah (dikurangi sedikit)
-    
-    // Kurva Quadratic Bezier
-    var controlPoint = Offset(size.width / 2, size.height);
-    var endPoint = Offset(size.width, size.height - 50);
-    
-    path.quadraticBezierTo(
-      controlPoint.dx, controlPoint.dy, 
-      endPoint.dx, endPoint.dy
+  Widget _buildSocialButton({required String text, required IconData icon, required Color color}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: kGreenLight.withOpacity(0.5), // Match template button bg
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white, 
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
-    
-    path.lineTo(size.width, 0); // Garis ke kanan atas
-    path.close();
-    return path;
   }
 
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
-    return false;
+  Widget _buildInputField({
+    required String label,
+    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: TextField(
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.grey[600]),
+          enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+          ),
+          focusedBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: kPrimaryColor, width: 2),
+          ),
+          suffixIcon: Icon(icon, color: Colors.grey[400]), // Icon on right
+        ),
+      ),
+    );
   }
 }

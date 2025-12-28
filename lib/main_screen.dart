@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mls/core/constants/colors.dart';
 import 'package:mls/features/home/presentation/pages/home_screen.dart';
 import 'package:mls/features/my_classes/presentation/pages/my_classes_screen.dart';
-import 'package:mls/features/notification/presentation/pages/notification_screen.dart';
+import 'package:mls/features/profile/presentation/pages/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -14,13 +14,11 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-
-
   // List of screens for each tab
   static const List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
-    MyClassesScreen(), // Replace placeholder
-    NotificationScreen(), // Replace placeholder
+    MyClassesScreen(), 
+    ProfileScreen(), // Now ProfileScreen
   ];
 
   void _onItemTapped(int index) {
@@ -43,11 +41,11 @@ class _MainScreenState extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.school),
-            label: 'Kelas Saya', // "My Classes"
+            label: 'Kelas', 
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifikasi',
+            icon: Icon(Icons.person), // Changed to Person Icon
+            label: 'Profil', // Changed Label
           ),
         ],
         currentIndex: _selectedIndex,

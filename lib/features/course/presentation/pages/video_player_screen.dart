@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui'; // For Blur
 import 'package:mls/core/constants/colors.dart';
 
 class VideoPlayerScreen extends StatelessWidget {
@@ -7,138 +8,169 @@ class VideoPlayerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBackgroundColor,
-      appBar: AppBar(
-        title: const Text('Video - User Interface Design...'),
-        backgroundColor: kPrimaryColor,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 1. Video Area (16:9 Black Container)
-            Container(
-              width: double.infinity,
-              height: 220, // Approx 16:9 for mobile width
-              color: Colors.black,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Placeholder Background (Optional)
-                  Opacity(
-                    opacity: 0.5,
-                    child: Image.asset(
-                      'assets/images/kampus.png', // Reuse existing image as thumb
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(color: Colors.black),
+      backgroundColor: Colors.black, // Immersive black
+      body: Stack(
+        children: [
+          // Background (blurred poster)
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/kampus.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+              child: Container(color: Colors.black.withOpacity(0.8)), // Dark overlay
+            ),
+          ),
+
+          SafeArea(
+            child: Column(
+              children: [
+                // Custom AppBar (Transparent)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 30),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.airplay, color: Colors.white, size: 24),
+                      const SizedBox(width: 20),
+                      const Icon(Icons.more_horiz, color: Colors.white, size: 24),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Video Surface (Mock)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 20, offset: const Offset(0, 10)),
+                        ],
+                        image: const DecorationImage(
+                          image: AssetImage('assets/images/kampus.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2), // Glass play button
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white.withOpacity(0.5)),
+                          ),
+                          child: const Icon(Icons.play_arrow, color: Colors.white, size: 40),
+                        ),
+                      ),
                     ),
                   ),
-                  // Play Icon & Title Overlay
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                
+                const SizedBox(height: 30),
+
+                // Track Info
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.red.withOpacity(0.9),
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: const Icon(Icons.play_arrow, color: Colors.white, size: 40),
-                      ),
-                      const SizedBox(height: 16),
                       const Text(
-                        'UI DESIGN',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2,
-                        ),
+                        'User Interface Design',
+                         style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Pertemuan 1 • Mobile Programming',
+                        style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 16),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            
-            // 2. Playlist Section
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Video Lain Nya',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: kTextColor,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // List of Recommendations
-                  _buildVideoItem('Pengantar UX Design', '12:30'),
-                  _buildVideoItem('Wireframing Basics', '08:45'),
-                  _buildVideoItem('Color Theory', '15:20'),
-                  _buildVideoItem('Typography in Mobile', '10:00'),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVideoItem(String title, String duration) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          // Thumbnail
-          Container(
-            width: 100,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.circular(8),
-              image: const DecorationImage(
-                image: AssetImage('assets/images/kampus.png'), // Reuse placeholder
-                fit: BoxFit.cover,
-                opacity: 0.7,
-              ),
-            ),
-            alignment: Alignment.center,
-            child: const Icon(Icons.play_circle_outline, color: Colors.white),
-          ),
-          const SizedBox(width: 12),
-          // Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: kTextColor,
-                    fontSize: 14,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Durasi: $duration',
-                  style: const TextStyle(fontSize: 12, color: kTextLightColor),
+
+                const SizedBox(height: 30),
+
+                // Progress Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    children: [
+                      LinearProgressIndicator(
+                        value: 0.3,
+                        backgroundColor: Colors.white.withOpacity(0.2),
+                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                        minHeight: 4,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('12:10', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
+                          Text('-45:50', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Controls
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(icon: const Icon(Icons.skip_previous, color: Colors.white, size: 36), onPressed: () {}),
+                    const SizedBox(width: 30),
+                    IconButton(icon: const Icon(Icons.pause, color: Colors.white, size: 48), onPressed: () {}), // Pause
+                    const SizedBox(width: 30),
+                    IconButton(icon: const Icon(Icons.skip_next, color: Colors.white, size: 36), onPressed: () {}),
+                  ],
+                ),
+
+                const Spacer(),
+
+                // Up Next (Playlist style)
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.play_circle_filled, color: Colors.white),
+                      ),
+                      const SizedBox(width: 12),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('SELANJUTNYA', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+                          Text('Wireframing Basics', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.list, color: Colors.white),
+                    ],
+                  ),
                 ),
               ],
             ),

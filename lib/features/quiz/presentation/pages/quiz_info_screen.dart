@@ -10,89 +10,104 @@ class QuizInfoScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Quiz Review 1'),
-        backgroundColor: kPrimaryColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Silahkan kerjakan kuis ini untuk menguji pemahaman Anda mengenai materi pertemuan 1-3.',
-              style: TextStyle(fontSize: 16, color: kTextColor),
-            ),
-            const SizedBox(height: 24),
-            
-            // Container Info
+            // Hero Image / Icon
             Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(30),
               decoration: BoxDecoration(
-                color: kSurfaceColor,
-                borderRadius: BorderRadius.circular(12),
+                color: kPrimaryColor.withOpacity(0.05),
+                shape: BoxShape.circle,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildInfoRow('Batas Waktu', '15 Menit'),
-                  const SizedBox(height: 12),
-                  _buildInfoRow('Metode Penilaian', 'Nilai Tertinggi'),
-                  const SizedBox(height: 12),
-                  _buildInfoRow('Jumlah Soal', '15 Soal'),
-                ],
-              ),
+              child: const Icon(Icons.quiz_rounded, size: 80, color: kPrimaryColor),
+            ),
+            const SizedBox(height: 30),
+            
+            // Title
+            const Text(
+              'Kuis Pertemuan 1',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: kTextColor),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Uji pemahaman Anda tentang materi pertemuan 1-3. Pastikan koneksi internet lancar.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey[600], height: 1.5),
             ),
             
-            const Spacer(),
-            
-            // Buttons
+            const SizedBox(height: 40),
+
+            // Info Grid
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildInfoItem(Icons.timer_outlined, '15 Menit', 'Durasi'),
+                Container(width: 1, height: 40, color: Colors.grey[300]),
+                _buildInfoItem(Icons.list_alt, '15 Soal', 'Jumlah'),
+                Container(width: 1, height: 40, color: Colors.grey[300]),
+                _buildInfoItem(Icons.star_outline, 'Tertinggi', 'Penilaian'),
+              ],
+            ),
+
+            const SizedBox(height: 60),
+
+            // Start Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: kPrimaryColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  elevation: 5,
+                  shadowColor: kPrimaryColor.withOpacity(0.4),
                 ),
                 onPressed: () {
-                   Navigator.push(
+                   Navigator.pushReplacement( // Use pushReplacement so back doesn't go here
                     context,
                     MaterialPageRoute(builder: (context) => const QuizScreen()),
                   );
                 },
-                child: const Text('Ambil Kuis'),
+                child: const Text(
+                  'Mulai Kerjakan',
+                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
             const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: kPrimaryColor),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Kembali Ke Kelas', style: TextStyle(color: kPrimaryColor)),
-              ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal', style: TextStyle(color: Colors.grey)),
             ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildInfoItem(IconData icon, String value, String label) {
+    return Column(
       children: [
-        Text(label, style: const TextStyle(color: kTextLightColor, fontSize: 14)),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        Icon(icon, color: kPrimaryColor, size: 28),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: kTextColor),
+        ),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+        ),
       ],
     );
   }

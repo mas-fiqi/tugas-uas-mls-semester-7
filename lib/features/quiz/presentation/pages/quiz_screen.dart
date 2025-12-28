@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mls/core/constants/colors.dart';
+import 'package:mls/features/quiz/presentation/pages/quiz_result_screen.dart';
+import 'dart:async'; // For Timer
 
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key});
@@ -9,114 +11,139 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  int _selectedOptionIndex = -1; // -1 means no option selected
+  int _selectedOptionIndex = -1;
   int _currentQuestionIndex = 0;
   
-  // Dummy Questions
+  // Timer Logic
+  Timer? _timer;
+  int _remainingSeconds = 15 * 60; // 15 Minutes
+
   final List<Map<String, dynamic>> _questions = [
     {
-      'question': 'Radio button dapat digunakan untuk menentukan?',
-      'options': ['Pilihan Ganda', 'Pilihan Tunggal', 'Input Teks', 'Upload File', 'Navigasi'],
+      'question': 'Widget manakah yang digunakan untuk menyusun elemen secara vertikal?',
+      'options': ['Row', 'Column', 'Stack', 'Container', 'ListView'],
     },
-    // Add more dummy if needed, but for UI demo 1 is enough or repeated.
+    {
+       'question': 'Perintah untuk membuat project Flutter baru adalah?',
+       'options': ['flutter new', 'flutter start', 'flutter create', 'flutter init', 'flutter run'],
+    },
+     // Repeats for demo if needed
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingSeconds > 0) {
+        setState(() {
+          _remainingSeconds--;
+        });
+      } else {
+        _timer?.cancel();
+        _finishQuiz();
+      }
+    });
+  }
+
+  void _finishQuiz() {
+    _timer?.cancel();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const QuizResultScreen()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String get _timerText {
+    int minutes = _remainingSeconds ~/ 60;
+    int seconds = _remainingSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')} : ${seconds.toString().padLeft(2, '0')}';
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Quiz Review 1'),
-        backgroundColor: kPrimaryColor,
-        actions: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            margin: const EdgeInsets.only(right: 16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: const [
-                Icon(Icons.timer, color: Colors.white, size: 20),
-                SizedBox(width: 8),
-                Text('15 : 00', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              ],
-            ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.black),
+          onPressed: () => _showExitDialog(),
+        ),
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.orange[50],
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.orange[100]!),
           ),
-        ],
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.timer_outlined, color: Colors.orange, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                _timerText,
+                style: const TextStyle(
+                  color: Colors.orange, 
+                  fontWeight: FontWeight.bold, 
+                  fontSize: 16
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       body: Column(
         children: [
-          // 1. Question Numbers
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  offset: const Offset(0, 4),
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-            child: SizedBox(
-              height: 40,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 15,
-                itemBuilder: (context, index) {
-                  final isActive = index == _currentQuestionIndex;
-                  return Container(
-                    width: 40,
-                    margin: const EdgeInsets.only(right: 12),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isActive ? kAccentColor : Colors.grey[200],
-                      border: isActive ? Border.all(color: kAccentColor, width: 2) : null,
-                    ),
-                    child: Text(
-                      '${index + 1}',
-                      style: TextStyle(
-                        color: isActive ? Colors.white : kTextColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+          // Linear Progress Bar
+          LinearProgressIndicator(
+            value: (_currentQuestionIndex + 1) / 15,
+            backgroundColor: Colors.grey[100],
+            valueColor: const AlwaysStoppedAnimation<Color>(kPrimaryColor),
+            minHeight: 4,
           ),
-
-          // 2. Question View
+          
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Question Counter
                   Text(
-                    'Soal Nomor ${_currentQuestionIndex + 1} / 15',
-                    style: const TextStyle(color: kTextLightColor, fontSize: 14),
+                    'Soal ${_currentQuestionIndex + 1} dari 15',
+                    style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
+                  
+                  // Question Text
                   Text(
-                    _questions[0]['question'], // Using dummy question 0 for all
+                    _questions[_currentQuestionIndex % _questions.length]['question'],
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 20, 
+                      fontWeight: FontWeight.bold, 
                       color: kTextColor,
+                      height: 1.4
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
 
-                  // Options
+                  // Options List
                   ...List.generate(5, (index) {
                     final options = ['A', 'B', 'C', 'D', 'E'];
-                    final optionText = _questions[0]['options'][index];
+                    final optionText = _questions[_currentQuestionIndex % _questions.length]['options'][index]; // Use modulo for demo safe
                     final isSelected = _selectedOptionIndex == index;
 
                     return GestureDetector(
@@ -125,32 +152,35 @@ class _QuizScreenState extends State<QuizScreen> {
                           _selectedOptionIndex = index;
                         });
                       },
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 12),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFFFFE5E5) : Colors.white, // Light Red if selected
-                          border: Border.all(
-                            color: isSelected ? kPrimaryColor : Colors.grey[300]!,
-                            width: isSelected ? 2 : 1,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
+                          color: isSelected ? kPrimaryColor : Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: isSelected 
+                              ? Border.all(color: kPrimaryColor) 
+                              : Border.all(color: Colors.grey[200]!),
+                          boxShadow: isSelected 
+                             ? [BoxShadow(color: kPrimaryColor.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] 
+                             : [],
                         ),
                         child: Row(
                           children: [
                             Container(
-                              width: 32,
-                              height: 32,
+                              width: 36,
+                              height: 36,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: isSelected ? kPrimaryColor : Colors.grey[200],
+                                color: isSelected ? Colors.white.withOpacity(0.2) : Colors.grey[100],
                                 shape: BoxShape.circle,
                               ),
                               child: Text(
                                 options[index],
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : kTextColor,
                                   fontWeight: FontWeight.bold,
+                                  color: isSelected ? Colors.white : Colors.grey[700],
                                 ),
                               ),
                             ),
@@ -159,8 +189,9 @@ class _QuizScreenState extends State<QuizScreen> {
                               child: Text(
                                 optionText,
                                 style: TextStyle(
-                                  color: isSelected ? kPrimaryColor : kTextColor,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  fontSize: 16,
+                                  color: isSelected ? Colors.white : kTextColor,
+                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                                 ),
                               ),
                             ),
@@ -174,34 +205,79 @@ class _QuizScreenState extends State<QuizScreen> {
             ),
           ),
 
-          // 3. Navigation Button
+          // Bottom Navigation
           Container(
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
               color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.black12)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, -5),
+                ),
+              ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Prev Button (Hidden on first question)
+                _currentQuestionIndex > 0 ?
+                TextButton.icon(
+                  onPressed: () {
+                     setState(() {
+                       _currentQuestionIndex--;
+                       _selectedOptionIndex = -1; // Reset for demo
+                     });
+                  },
+                  icon: const Icon(Icons.arrow_back, color: Colors.grey),
+                  label: const Text('Sebelumnya', style: TextStyle(color: Colors.grey)),
+                ) : const SizedBox.shrink(),
+
+                // Next Button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPrimaryColor,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () {
-                    // Logic for next question
+                    if (_currentQuestionIndex < 14) {
+                      setState(() {
+                        _currentQuestionIndex++;
+                        _selectedOptionIndex = -1;
+                      });
+                    } else {
+                      _finishQuiz();
+                    }
                   },
-                  child: Row(
-                    children: const [
-                      Text('Soal Selanjutnya'),
-                      SizedBox(width: 8),
-                      Icon(Icons.arrow_forward, size: 16),
-                    ],
+                  child: Text(
+                    _currentQuestionIndex == 14 ? 'Selesai' : 'Selanjutnya',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showExitDialog() {
+    showDialog(
+      context: context, 
+      builder: (context) => AlertDialog(
+        title: const Text('Keluar Quiz?'),
+        content: const Text('Waktu akan terus berjalan. Yakin ingin keluar?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          TextButton(
+            onPressed: () {
+               Navigator.pop(context); // Close dialog
+               Navigator.pop(context); // Exit screen
+            }, 
+            child: const Text('Keluar', style: TextStyle(color: Colors.red))
           ),
         ],
       ),
