@@ -18,7 +18,6 @@ final ThemeData appTheme = ThemeData(
     seedColor: kPrimaryColor,
     primary: kPrimaryColor,
     secondary: kAccentColor,
-    background: kBackgroundColor,
     surface: kSurfaceColor,
   ),
   textTheme: const TextTheme(

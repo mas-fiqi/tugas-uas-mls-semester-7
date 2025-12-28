@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mls/core/constants/colors.dart';
 import 'package:mls/features/home/presentation/pages/home_screen.dart';
 import 'package:mls/features/my_classes/presentation/pages/my_classes_screen.dart';
+import 'package:mls/features/notification/presentation/pages/notification_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -19,13 +20,7 @@ class _MainScreenState extends State<MainScreen> {
   static const List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
     MyClassesScreen(), // Replace placeholder
-    // Placeholder untuk Notifikasi
-    Center(
-      child: Text(
-        'Halaman Notifikasi',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: kTextLightColor),
-      ),
-    ),
+    NotificationScreen(), // Replace placeholder
   ];
 
   void _onItemTapped(int index) {

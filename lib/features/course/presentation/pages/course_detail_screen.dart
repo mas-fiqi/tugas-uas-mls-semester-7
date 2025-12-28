@@ -60,6 +60,7 @@ class CourseDetailScreen extends StatelessWidget {
                       ListTile(
                         leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
                         title: const Text('Slide Presentasi.pdf'),
+                        trailing: const Icon(Icons.check_circle, color: kAccentColor), // Completed
                         onTap: () {},
                       ),
                       ListTile(

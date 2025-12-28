@@ -63,11 +63,20 @@ class MyClassesScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: kBackgroundColor,
       appBar: AppBar(
-        title: const Text('Kelas Saya'),
+        title: const Text(
+          'Kelas Saya',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         foregroundColor: kTextColor,
         elevation: 0,
-        centerTitle: false,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // Logic handled by TabController usually, but adding for UI compliance
+          },
+        ),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
