@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mls/core/constants/colors.dart';
 import 'package:mls/shared/widgets/course_card.dart';
+import 'package:mls/features/profile/presentation/pages/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -38,11 +39,18 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const CircleAvatar(
-                  radius: 25,
-                  backgroundColor: kSurfaceColor,
-                  child: Icon(Icons.person, color: kPrimaryColor),
-                  // TODO: Ganti dengan Image.network/asset untuk foto profil
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                    );
+                  },
+                  child: const CircleAvatar(
+                    radius: 25,
+                    backgroundColor: kSurfaceColor,
+                    child: Icon(Icons.person, color: kPrimaryColor),
+                  ),
                 ),
               ],
             ),

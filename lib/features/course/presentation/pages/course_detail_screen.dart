@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mls/core/constants/colors.dart';
+import 'package:mls/features/quiz/presentation/pages/quiz_info_screen.dart';
 
 class CourseDetailScreen extends StatelessWidget {
   final String courseName;
@@ -78,9 +79,9 @@ class CourseDetailScreen extends StatelessWidget {
             ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _buildTaskItem('Tugas 1: Analisis UI', 'Deadline: Kemarin', true),
-                _buildTaskItem('Tugas 2: Wireframing', 'Deadline: Besok, 23:59', false),
-                _buildTaskItem('Kuis 1: Teori Dasar', 'Status: Belum Mengerjakan', false),
+                _buildTaskItem(context, 'Tugas 1: Analisis UI', 'Deadline: Kemarin', true),
+                _buildTaskItem(context, 'Tugas 2: Wireframing', 'Deadline: Besok, 23:59', false),
+                _buildTaskItem(context, 'Kuis 1: Teori Dasar', 'Status: Belum Mengerjakan', false),
               ],
             ),
           ],
@@ -89,12 +90,12 @@ class CourseDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTaskItem(String title, String subtitle, bool isDone) {
+  Widget _buildTaskItem(BuildContext context, String title, String subtitle, bool isDone) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: Icon(
-          Icons.assignment,
+          title.contains('Kuis') ? Icons.quiz : Icons.assignment,
           color: isDone ? kAccentColor : kPrimaryColor,
         ),
         title: Text(
@@ -109,7 +110,12 @@ class CourseDetailScreen extends StatelessWidget {
             ? const Icon(Icons.check_circle, color: kAccentColor)
             : const Icon(Icons.radio_button_unchecked, color: Colors.grey),
         onTap: () {
-          // Navigate to task detail
+          if (title.contains('Kuis')) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const QuizInfoScreen()),
+            );
+          }
         },
       ),
     );
