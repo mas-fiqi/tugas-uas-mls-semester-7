@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mls/core/constants/colors.dart';
+import 'package:mls/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -96,12 +97,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
                   
+
+
                   // Tombol Log In
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // TODO: Implement Login Logic
+                         // Navigasi ke MainScreen (Dashboard)
+                         Navigator.of(context).pushReplacement(
+                           MaterialPageRoute(builder: (context) => const MainScreen()),
+                         );
                       },
                       child: const Text('Log In'),
                     ),
