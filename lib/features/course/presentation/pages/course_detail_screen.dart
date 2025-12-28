@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mls/core/constants/colors.dart';
 import 'package:mls/features/quiz/presentation/pages/quiz_info_screen.dart';
+import 'package:mls/features/task/presentation/pages/task_detail_screen.dart';
+import 'package:mls/features/course/presentation/pages/video_player_screen.dart';
+import 'package:mls/features/course/presentation/pages/document_viewer_screen.dart';
 
 class CourseDetailScreen extends StatelessWidget {
   final String courseName;
@@ -62,12 +65,22 @@ class CourseDetailScreen extends StatelessWidget {
                         leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
                         title: const Text('Slide Presentasi.pdf'),
                         trailing: const Icon(Icons.check_circle, color: kAccentColor), // Completed
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const DocumentViewerScreen()),
+                          );
+                        },
                       ),
                       ListTile(
                         leading: const Icon(Icons.video_library, color: Colors.blue),
                         title: const Text('Rekaman Zoom'),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const VideoPlayerScreen()),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -114,6 +127,11 @@ class CourseDetailScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const QuizInfoScreen()),
+            );
+          } else if (title.contains('Tugas')) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const TaskDetailScreen()),
             );
           }
         },
