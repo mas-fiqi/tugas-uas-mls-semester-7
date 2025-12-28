@@ -7,6 +7,7 @@ class CourseCard extends StatelessWidget {
   final double progress; // 0.0 to 1.0
   final Color iconColor;
   final IconData iconData;
+  final VoidCallback? onTap;
 
   const CourseCard({
     super.key,
@@ -15,12 +16,15 @@ class CourseCard extends StatelessWidget {
     required this.progress,
     this.iconColor = Colors.blue,
     this.iconData = Icons.book,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,

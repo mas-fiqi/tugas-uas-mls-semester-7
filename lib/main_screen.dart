@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mls/core/constants/colors.dart';
 import 'package:mls/features/home/presentation/pages/home_screen.dart';
+import 'package:mls/features/my_classes/presentation/pages/my_classes_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -12,16 +13,12 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
+
+
   // List of screens for each tab
   static const List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
-    // Placeholder untuk Kelas Saya
-    Center(
-      child: Text(
-        'Halaman Kelas Saya',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: kTextLightColor),
-      ),
-    ),
+    MyClassesScreen(), // Replace placeholder
     // Placeholder untuk Notifikasi
     Center(
       child: Text(
